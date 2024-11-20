@@ -5,12 +5,8 @@ import { getInfoRequest, getInfoSuccess } from "./reducer";
 
 // Function to fetch data
 const infoFetch = async () => {
-
     const responseFromUrl = await fetch('https://6732c7cf2a1b1a4ae110e228.mockapi.io/info').then(res => res);
-
-    // Reads the request body and returns it as a promise that resolves with the result of parsing the body text as JSON (Taking JSON as input and parsing it to produce a JavaScript object)
     const result = await responseFromUrl.json();
-
     return result;
 }
 
@@ -18,8 +14,8 @@ const infoFetch = async () => {
 function *workGetInfoFetch(): any{
     try{
         const info = yield call(infoFetch);
-        console.log(info);
         yield put(getInfoSuccess(info));
+        //console.log(yield put(getInfoSuccess(info)) + "info is"    + typeof(yield put(getInfoSuccess(info))));
     }catch(e: any){
         yield put({type: GET_INFO_FAILURE, message: e.message});
     } 
