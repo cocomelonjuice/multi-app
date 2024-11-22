@@ -18,7 +18,7 @@ function SearchFilter ({query, onChange}: any){
   )
 }
 
-function ListItem ({item}: any) {
+export function ListItem ({item}: any) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const dispatch = useDispatch();
@@ -79,7 +79,6 @@ function handleTask() {
   const [taskValue, setTaskValue] = useState("");
   const [query, setQuery] = useState("");
   
-
   const [filterType, setFilterType]= useState("All");
  // const filterTypeResult = filterRadioButton(inputTask, filterType);
 
@@ -91,15 +90,15 @@ function handleTask() {
   };
 
   const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log({e: e.target.value})
-   setQuery(e.target.value);
+    setQuery(e.target.value);
   }
 
   const handleFilterChange = (type: string) => {
     setFilterType(type);
   };
 
-  const filterResult =  filterItem(inputTask, query, filterType);
+  const filterResult = filterItem(inputTask, query, filterType);
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-row justify-center gap-2 ">
@@ -129,11 +128,13 @@ function handleTask() {
           Add
         </button>
       </div>
-      <div><Pagination /></div>
-          {/*{query !== "" ? (filterResult.length === 0?<div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>:<ListItem item={filterResult}/>):<ListItem item={inputTask}/>}*/}
+      <Pagination filterResult={filterResult} total={filterResult?.length}/>
+         
+      {/* {filterResult.length !==0 ?<ListItem item={filterResult}/>: <div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>} */}
+
+       {/*{query !== "" ? (filterResult.length === 0?<div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>:<ListItem item={filterResult}/>):<ListItem item={inputTask}/>}*/}
           {/*{filterTypeResult.length !==0 && <ListItem item={filterTypeResult}/> }*/}
           {/*<ListItem item={mergeFilterResult}/>*/}
-          {filterResult.length !==0 ?<ListItem item={filterResult}/>: <div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>}
 
     </div>
   );
