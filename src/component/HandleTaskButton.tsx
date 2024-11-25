@@ -3,9 +3,9 @@ import { useState } from "react";
 import {createTask, deleteTask, toggleTask, editTask} from "../store/taskreducer";
 import { Task } from "../store/taskreducer";
 import {filterItem} from "./FilterLogic";
-import { Pagination } from "./Pagination";
+import Pagination from "./Pagination";
 
-function SearchFilter ({query, onChange}: any){
+function SearchFilter ({query, onChange}: {query:string, onChange: any}){
   return (
     <div className="flex gap-2">
       <div>Search task</div>
@@ -18,7 +18,7 @@ function SearchFilter ({query, onChange}: any){
   )
 }
 
-export function ListItem ({item}: any) {
+export function ListItem ({item}: Task[]) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const dispatch = useDispatch();
@@ -127,8 +127,10 @@ function handleTask() {
         <button className="rounded-md border border-green-500 text-green-500 font-medium p-1 hover:text-white hover:bg-green-700" onClick={handleCreateTask}>
           Add
         </button>
+        
       </div>
-      <Pagination filterResult={filterResult} total={filterResult?.length}/>
+      
+      {filterResult.length !==0 ?<Pagination filterResult={filterResult} total={filterResult?.length}/>: <div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>}
          
       {/* {filterResult.length !==0 ?<ListItem item={filterResult}/>: <div className="font-bold text-red-500 text-xl">NO MATCHES FOUND</div>} */}
 

@@ -1,97 +1,173 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react";
 import { Task } from "../store/taskreducer";
-import { nanoid } from 'nanoid'
-import {ListItem} from "./HandleTaskButton"
+import { ListItem } from "./HandleTaskButton";
+import {useSearchParams}  from "react-router-dom";
+import { nanoid } from 'nanoid';
 
-export function Pagination ({total,filterResult}: {total:number, filterResult: Task[]}){
+function Pagination({ total, filterResult }: { total: number; filterResult: Task[] }) {
 
-    const [showTaskPerPage, setShowTaskPerPage] = useState("5");
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageCount = Math.ceil(total/(Number(showTaskPerPage)));
+  const [searchParams, setSearchParams] = useSearchParams();  
 
-    // const previousPage= useRef<number>(1);
+  const initialShowTaskPerPage = parseInt(searchParams.get("showTaskPerPage") || "5");
+  const initialCurrentPage = parseInt(searchParams.get("currentPage") || "1");
 
-    // useEffect(()=>{
-    //     previousPage.current = currentPage;
-    // }, [currentPage]);
+  //const [showTaskPerPage, setShowTaskPerPage] = useState("5");
+  //const [currentPage, setCurrentPage] = useState(1);
+  const [showTaskPerPage, setShowTaskPerPage] = useState(initialShowTaskPerPage);
+  const [currentPage, setCurrentPage] = useState(initialCurrentPage);
 
-    //const filterPagingResult2: Task[]= filterResult.slice(1*10, (1 + 1)*10);
-    //const filterPagingResult2: Task[]= filterResult.slice(currentPage*total, (currentPage + 1)*total);
-    // const showData: Task[] = filterPagingResult2;
-    // console.log(" showData is "+ showData);
-    function handleSetCurrentPage(currentPage: number){
-        setCurrentPage(currentPage);
-        // previousPage.current = currentPage;
-        // if(currentPage >= Number(previousPage) ){
-        //     setCurrentPage(Math.min(currentPage + 1, pageCount - 1));          
-        //     console.log("increment");
-        // }else if (currentPage < Number(previousPage)){
-        //     setCurrentPage(Math.max(currentPage - 1, 0));
-        //     console.log("decrement");
-        // }
-        //const filterPagingResult = filterResult.slice(currentPage*total, (currentPage + 1)*total);
-        //const filterPagingResult2 = filterResult.slice(1*1, (1 + 1)*1);
-        //console.log({filterResult, currentPage, filterPagingResult, previousPage});
-    }
+  const pageCount = Math.ceil(total / Number(showTaskPerPage));
+  const pageNumbers = useMemo(() => {
+     const result = Array.from({ length: pageCount }, (_, index) => index + 1);
+     return result;
+  }, [pageCount]);
 
-    const getPaginatedTasks = () => {
-        const indexOfLastTask = currentPage * Number(showTaskPerPage);
-        const indexOfFirstTask = indexOfLastTask - Number(showTaskPerPage);
-        return filterResult.slice(indexOfFirstTask, indexOfLastTask);
-    };
-    
-    return (
-        <div className="flex flex-col justify-center items-center gap-2">
+  const getPaginatedTasks = (): Task[] => {
+    const indexOfLastTask = currentPage * Number(showTaskPerPage);
+    const indexOfFirstTask = indexOfLastTask - Number(showTaskPerPage);
+    return filterResult.slice(indexOfFirstTask, indexOfLastTask);
+  };
 
-            <div className="flex flex-row">
-                <div className=" flex flex-row rounded-md border-black border-2 p-2 gap-4  max-w-72">
-                    <div>Show per page</div>
-                    <select value={showTaskPerPage} onChange={(e:any)=>setShowTaskPerPage(e.target.value)} >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                    </select>
-                </div>
+  function handleSetCurrentPage(page: number) {
+    setCurrentPage(page);
+  }
 
-                <div className=" flex flex-row border-black rounded-sm border-2">
-                    {Array.from({length: pageCount},(_,number) =>(
-                        <ul key={nanoid()} onClick={()=>handleSetCurrentPage(number+1)} className="min-w-12 hover:bg-teal-200 border-black rounded-sm border-2 p-1 font-bold">
-                        {number+1}
-                        </ul>
-                    ))} 
-                </div>
+  useEffect(() => {
+    setSearchParams({ showTaskPerPage, currentPage: String(currentPage) });
+  }, [showTaskPerPage, currentPage, setSearchParams]);
 
-            </div>    
+//   useEffect(() => {
+//     setCurrentPage(1);
+//   }, [showTaskPerPage]);
 
-            <div className="mt-2">
-                <ListItem item={getPaginatedTasks()} />
-            </div> 
-
+  return (
+    <div className="flex flex-col justify-center items-center gap-4">
+      <div className="flex flex-row gap-2">
+        <div className="flex flex-row rounded-md border-black border-2 p-2 gap-4 max-w-72">
+          <div>Show per page</div>
+          <select
+            value={showTaskPerPage}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowTaskPerPage(e.target.value)}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+          </select>
         </div>
-    )
+
+        <div className="flex flex-row gap-2">
+          {pageNumbers.map((number) => (
+            <ul
+              key={nanoid()} 
+              onClick={() => handleSetCurrentPage(number)}
+              className={
+                currentPage === number
+                  ? "min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white bg-orange-400 text-white"
+                  : "min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white"
+              }
+            >
+              {number}
+            </ul>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-2">
+        <ListItem item={getPaginatedTasks()} />
+      </div>
+    </div>
+  );
 }
 
-{/* <div className="border-black border-8"><ul>
-            {getPaginatedTasks().map((task: Task) => (
-                <li key={task.id}>
-                    <h3>{task.text}</h3>
-                </li>
-            ))}
-            </ul></div> */}
+export default Pagination;
 
-// function ShowPagingTask({taskList}: Task[]){
-//     return (
-//         <ul>
-//           {taskList.map((task: Task) => (
-//             <li key={task.id}>
-//               <h3>{task.text}</h3>
-//             </li>
-//           ))}
-//         </ul>
-//       );
+
+
+
+
+
+
+
+
+// import { useState, useRef, useEffect, useMemo, memo} from "react";
+// import { Task } from "../store/taskreducer";
+// import { nanoid } from 'nanoid'
+// import {ListItem} from "./HandleTaskButton"
+
+// function Pagination ({total,filterResult}: {total:number, filterResult: Task[]}){
+
+//     const [showTaskPerPage, setShowTaskPerPage] = useState("5");
+//     const [currentPage, setCurrentPage] = useState(1);
+//     const pageCount = Math.ceil(total/(Number(showTaskPerPage)));
+
+//     // const previousPage= useRef<number>(1);
+//     // useEffect(()=>{
+//     //     previousPage.current = currentPage;
+//     // }, [currentPage]);
+
+//     function handleSetCurrentPage(currentPage: number){
+//         setCurrentPage(currentPage);
 //     }
 
-//    
+//     useEffect(()=>{
+//         setCurrentPage(1);
+//     },[showTaskPerPage])
+
+//     const getPaginatedTasks = ():Task[] => {
+//         const indexOfLastTask = currentPage * Number(showTaskPerPage);
+//         const indexOfFirstTask = indexOfLastTask - Number(showTaskPerPage);
+//         return filterResult.slice(indexOfFirstTask, indexOfLastTask);
+//     };
+
+// //     const memoizedPaging = useMemo(()=> {
+// //         const newArray = [];
+// //         for (let i = 1; i < total; i++) {
+// //         newArray.push(i);
+// //     }
+// //     return newArray;
+// //   }, [newArray]);
+    
+//     return (
+//         <div className="flex flex-col justify-center items-center gap-4">
+
+//             <div className="flex flex-row gap-2">
+//                 <div className=" flex flex-row rounded-md border-black border-2 p-2 gap-4  max-w-72">
+//                     <div>Show per page</div>
+//                     <select value={showTaskPerPage} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>setShowTaskPerPage(e.target.value)} >
+//                         <option value="5">5</option>
+//                         <option value="10">10</option>
+//                         <option value="15">15</option>
+//                         <option value="20">20</option>
+//                     </select>
+//                 </div>
+
+//                 <div className=" flex flex-row gap-2">
+//                     {Array.from({length: pageCount},(_,number) =>(
+//                         <ul key={nanoid()} onClick={()=>handleSetCurrentPage(number+1)} className={currentPage === number+1?"min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white bg-orange-400 text-white":"min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white"}>
+//                         {number+1}
+//                         </ul>
+//                     ))} 
+//                 </div>
+
+//                 {/* <div className=" flex flex-row gap-2">
+//                     {memoizedPaging.map((number) =>(
+//                         <ul key={nanoid()} onClick={()=>handleSetCurrentPage(number+1)} className={currentPage === number?"min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white bg-orange-400 text-white":"min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white"}>
+//                         {number}
+//                         </ul>
+//                     ))} 
+//                 </div> */}
+//             </div>    
+
+//             <div className="mt-2">
+//                 <ListItem item={getPaginatedTasks()} />
+//             </div> 
+            
+//         </div>
+//     )
+// }
+// export default Pagination;
+  
+
 
 
