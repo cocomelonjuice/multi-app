@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Task } from "../store/taskreducer";
 import { ListItem } from "./HandleTaskButton";
 import {useSearchParams}  from "react-router-dom";
@@ -33,17 +33,22 @@ function Pagination({ total, filterResult }: { total: number; filterResult: Task
   }
 
   useEffect(() => {
-    setSearchParams({ showTaskPerPage, currentPage: String(currentPage) });
+    setSearchParams({ showTaskPerPage: String(showTaskPerPage), currentPage: String(currentPage) });
   }, [showTaskPerPage, currentPage, setSearchParams]);
 
-//   useEffect(() => {
-//     setCurrentPage(1);
-//   }, [showTaskPerPage]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [showTaskPerPage]);
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4">
+    <div className="flex flex-col justify-center items-center gap-4 text-xs">
+      
+      <div className={filterResult.length!==0?"mt-2 border-2 pl-4 pt-4 grid grid-rows-5 gap-2 overflow-scroll max-h-96":"mt-2 border-2 pl-4 pt-4 grid grid-rows-5 gap-2 overflow-scroll min-h-96 min-w-full"}>
+        <ListItem item={getPaginatedTasks()} />
+      </div>
+
       <div className="flex flex-row gap-2">
-        <div className="flex flex-row rounded-md border-black border-2 p-2 gap-4 max-w-72">
+        <div className="flex flex-row rounded-md border-gray-400 border-2 p-1 gap-1 max-w-72">
           <div>Show per page</div>
           <select
             value={showTaskPerPage}
@@ -56,15 +61,15 @@ function Pagination({ total, filterResult }: { total: number; filterResult: Task
           </select>
         </div>
 
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-1">
           {pageNumbers.map((number) => (
             <ul
               key={nanoid()} 
               onClick={() => handleSetCurrentPage(number)}
               className={
                 currentPage === number
-                  ? "min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white bg-orange-400 text-white"
-                  : "min-w-12 hover:bg-teal-600 border-teal-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white"
+                  ? "min-w-12 hover:bg-teal-400 hover:border-teal-400 border-orange-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white bg-orange-400  text-white"
+                  : "min-w-12 hover:bg-teal-400 hover:border-teal-400 border-gray-400 rounded-md border-2 px-1 py-1.5 font-bold hover:text-white"
               }
             >
               {number}
@@ -73,9 +78,6 @@ function Pagination({ total, filterResult }: { total: number; filterResult: Task
         </div>
       </div>
 
-      <div className="mt-2">
-        <ListItem item={getPaginatedTasks()} />
-      </div>
     </div>
   );
 }

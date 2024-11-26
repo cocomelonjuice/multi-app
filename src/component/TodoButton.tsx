@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 function todoButton (){
 
@@ -9,7 +9,7 @@ function todoButton (){
 
     return (
         <div>
-            <button className="p-2 border-blue-500 rounded-md border-4 bg-blue-200 hover:shadow-xl hover:bg-blue-600 hover:text-white" onClick={()=>handleTodoPage(`/TaskMainPage`)}>Go to Todo Main Page</button>
+            <button className="p-2 border-blue-500 rounded-md border-4 bg-blue-200 hover:shadow-xl hover:bg-blue-600 hover:text-white" onClick={()=>handleTodoPage(`/task-main-page`)}>Go to Todo Main Page</button>
         </div>
     )
 }

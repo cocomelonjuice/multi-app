@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { TaskState } from './taskreducer';
+import { ImageState } from './imagereducer';
 
 export interface InfoState {
     info: Info.InfoItem[],

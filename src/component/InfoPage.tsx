@@ -19,7 +19,7 @@ function InfoPage() {
   if (!selectInfo) {
     return (
       <div>
-        <h1>Info not found</h1>
+        <h1 className="text-red-600 font-bold text-lg">INFO NOT FOUND</h1>
         <button onClick={()=>handleRedirect(`/`)} className="p-2 border-red-500 rounded-md border-4 bg-orange-200 hover:shadow-xl hover:bg-orange-600 hover:text-white">Return to Home</button>
       </div>
     )
